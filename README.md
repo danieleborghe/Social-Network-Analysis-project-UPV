@@ -1,6 +1,6 @@
-# Social Network Analysis of Portuguese Twitch Streamers
+# Social Network Analysis of the Spotify Artist Collaboration Network
 
-This repository contains a comprehensive Social Network Analysis (SNA) of the community of Portuguese-speaking streamers on Twitch. The project constructs a network graph based on mutual following relationships to analyze its structure, identify key influencers, and uncover community clusters.
+This repository contains a comprehensive Social Network Analysis (SNA) project focused on the collaboration network between artists on Spotify. We analyze the structure of this vast network to identify key influencers, uncover community structures based on musical genres, and assess the network's resilience to disruptions.
 
 This project was developed for the "Social Network Analysis" course at the **Universitat Politècnica de València (UPV)**.
 
@@ -10,92 +10,94 @@ This project was developed for the "Social Network Analysis" course at the **Uni
 
 ## 📝 Table of Contents
 
-- [Project Goal: Mapping the Twitch PT Community](#-project-goal-mapping-the-twitch-pt-community)
-- [The Dataset: A Snapshot of Twitch Portugal](#-the-dataset-a-snapshot-of-twitch-portugal)
+- [Project Goal: Mapping the Music Industry's Connections](#-project-goal-mapping-the-music-industrys-connections)
+- [Methodology: A Graph-Based Approach to Music](#-methodology-a-graph-based-approach-to-music)
 - [Technical Stack & Tools](#-technical-stack--tools)
-- [Analysis Workflow & Methodologies](#-analysis-workflow--methodologies)
+- [The Dataset: A Sprawling Network of Artists](#-the-dataset-a-sprawling-network-of-artists)
+- [Analysis Workflow & Techniques](#-analysis-workflow--techniques)
 - [Key Findings & Insights](#-key-findings--insights)
 - [Repository Structure](#-repository-structure)
-- [How to Run the Analysis](#-how-to-run-the-analysis)
-- [Authors](#-authors)
+- [How to Run This Project](#-how-to-run-this-project)
+- [Author](#-author)
 
 ---
 
-## 🎯 Project Goal: Mapping the Twitch PT Community
+## 🎯 Project Goal: Mapping the Music Industry's Connections
 
-Twitch is a massive platform where communities form around content creators. This project aims to move beyond simple viewership metrics to understand the underlying social structure of the Portuguese-speaking Twitch scene.
+The music industry is a highly interconnected ecosystem where collaborations define genres, drive trends, and launch careers. This project aims to model and analyze these connections by treating the Spotify artist "feature" landscape as a massive social network.
 
-Our main objectives are:
--   **Construct and Visualize** the social network graph of Twitch PT streamers.
--   **Analyze the Network's Topology**: Understand its overall properties, such as density, connectivity, and centralization.
--   **Identify Key Influencers**: Use centrality measures to find the most important and influential streamers in the network.
--   **Discover Community Structures**: Apply community detection algorithms to identify sub-groups or "cliques" of streamers who are more interconnected with each other than with the rest of the network.
--   **Compare to Theoretical Models**: Determine if the network follows patterns of known graph models (like scale-free or small-world networks).
+Our primary research questions are:
+-   Who are the most central and influential artists connecting different parts of the music world?
+-   Do artists form distinct communities, and do these clusters correspond to specific genres or regions?
+-   How robust is the collaboration network? What happens if key artists are removed, either randomly or through targeted "attacks"?
 
 ---
 
-## 📊 The Dataset: A Snapshot of Twitch Portugal
+## 💡 Methodology: A Graph-Based Approach to Music
 
-The dataset for this project was sourced from the Twitch API and captures the network of Portuguese-speaking streamers.
+We model the artist collaboration network as a **graph**, where each **node** is an artist and an **edge** represents a feature collaboration between two artists. This powerful abstraction allows us to apply a suite of SNA techniques to uncover patterns that are invisible at a surface level.
 
--   **Nodes**: Represent individual Twitch streamers (13,853 unique streamers).
--   **Edges**: Represent a **mutual follow** relationship between two streamers. An edge exists if Streamer A follows Streamer B AND Streamer B follows Streamer A (24,797 mutual connections).
--   **Attributes**: Node attributes include `language`, `creation date`, `total views`, and `mature content` flag.
-
-The graph is treated as **undirected**, since the follow relationship is mutual.
+Due to the immense size of the original network, a key part of our methodology was **network sampling**. We created smaller, representative subgraphs to make complex computations (like community detection and fault tolerance analysis) feasible on standard hardware.
 
 ---
 
 ## 💻 Technical Stack & Tools
 
+This project utilizes a standard Python-based stack for network analysis and data science.
+
 -   **Language**: **Python 3.x**
 -   **Core Libraries**:
-    -   **Pandas**: For data loading, cleaning, and manipulation of the node and edge lists.
-    -   **NetworkX**: The primary library for creating the graph object, performing all network analyses, and calculating metrics.
-    -   **Matplotlib** & **Seaborn**: For plotting distributions and statistical charts.
--   **Network Visualization**:
-    -   **Cytoscape**: Used for high-quality, interactive visualization of the network graph. It allows for advanced styling, layout algorithms, and exploration that are not possible with standard Python plotting libraries.
+    -   **`pandas`** & **`numpy`**: For data loading, cleaning, and manipulation.
+    -   **`networkx`**: The primary library for creating, manipulating, and analyzing graph structures.
+    -   **`matplotlib`** & **`seaborn`**: For plotting distributions and visualizing results.
+-   **Analysis Algorithms**:
+    -   **Centrality Measures**: Degree, Closeness, Betweenness, Eigenvector, PageRank, and HITS (Hubs & Authorities).
+    -   **Community Detection**: **Girvan-Newman** algorithm for identifying densely connected subgroups.
+-   **Visualization Software**:
+    -   **`Cytoscape`**: An open-source platform used for advanced, interactive network visualization.
 
 ---
 
-## ⚙️ Analysis Workflow & Methodologies
+## 📊 The Dataset: A Sprawling Network of Artists
 
-The project is divided into a systematic, multi-step analysis workflow.
+The full dataset captures a significant portion of the Spotify ecosystem:
+-   **Nodes**: Approximately **150,000 artists**.
+-   **Edges**: Over **300,000 collaborations**.
 
-1.  **Network Construction and Preprocessing**
-    -   Loading the raw node and edge CSV files.
-    -   Cleaning the data by removing isolated nodes (streamers with no mutual connections) to focus on the main network structure.
-    -   Constructing the graph object using NetworkX.
+To manage this scale, we worked with two primary samples:
+-   **Sample 1**: ~10,000 nodes and ~12,000 edges, used for preliminary and centrality analyses.
+-   **Sample 2**: ~900 nodes and ~700 edges, used for the more computationally intensive community detection and fault tolerance simulations.
 
-2.  **Global Network Analysis**
-    -   **Basic Metrics**: Calculating the number of nodes and edges, network density, and average degree.
-    -   **Connectivity**: Identifying connected components to see if the network is fragmented or cohesive. The analysis focuses on the **Giant Connected Component (GCC)**.
-    -   **Pathways**: Computing the network's diameter and average shortest path length to understand information flow efficiency.
+---
 
-3.  **Centrality Analysis (Identifying Key Players)**
-    -   **Degree Centrality**: To find streamers with the most direct connections (the most popular or "gregarious").
-    -   **Betweenness Centrality**: To find "bridges" or "brokers" who connect different parts of the network.
-    -   **Closeness Centrality**: To find streamers who can spread information most efficiently across the network.
-    -   **Eigenvector Centrality**: To find streamers who are connected to other highly connected streamers (influencers within influential circles).
+## ⚙️ Analysis Workflow & Techniques
 
-4.  **Community Detection**
-    -   **Goal**: To partition the network into communities or modules.
-    -   **Algorithm**: We use the **Louvain Modularity** algorithm, a highly efficient method for detecting community structures in large networks.
+Our analysis followed a structured, multi-stage workflow to progressively deepen our understanding of the network.
 
-5.  **Network Modeling**
-    -   **Goal**: To understand the underlying principles of the network's formation.
-    -   **Comparison**: We compare the degree distribution of our real-world Twitch network against two theoretical models:
-        -   **Erdős-Rényi (ER) Model**: A random graph model.
-        -   **Barabási-Albert (BA) Model**: A model that generates scale-free networks through preferential attachment.
+1.  **Data Preparation and Sampling**: The initial phase involved cleaning the data and developing a sampling strategy to create manageable subgraphs.
+
+2.  **Centrality Analysis**: We calculated a wide range of centrality metrics to identify the most important artists in the network. This helped us pinpoint key figures who are highly popular, act as bridges between communities, or are connected to other influential artists.
+
+3.  **Community Detection**:
+    -   **Goal**: To discover how the music world naturally clusters into communities.
+    -   **Method**: We applied the **Girvan-Newman algorithm** on our smaller sample to partition the network.
+    -   **Analysis**: We analyzed the resulting communities to understand their composition, identifying clusters corresponding to a "diverse urban and pop scene," "electronic and alternative fusion," a "vibrant Latin music hub," and others.
+
+4.  **Robustness and Fault Tolerance**:
+    -   **Goal**: To assess the network's resilience by simulating the removal of artists.
+    -   **Scenarios**:
+        -   **Random Failure**: Simulating an unexpected event where a random group of artists is removed.
+        -   **Targeted Attack**: Simulating a coordinated event where the most influential (most central) artists are removed.
+    -   **Metrics**: We measured the impact by observing changes in the **Giant Component size**, **Clustering Coefficient**, and **Average Shortest Path Length**.
 
 ---
 
 ## 📈 Key Findings & Insights
 
--   **Small-World, Scale-Free Network**: The Twitch PT network exhibits classic "small-world" properties (high clustering, short average path lengths) and follows a **power-law degree distribution**, characteristic of a **scale-free network**. This means a few streamers ("hubs") have a massive number of connections, while most have very few.
--   **Identified Hubs**: Centrality analysis successfully identified the top streamers who act as the main hubs and information brokers of the community. These are often the largest and most well-known content creators.
--   **Strong Community Structure**: The Louvain algorithm detected **16 distinct communities**, indicating that the network is not uniform but rather a collection of tighter sub-groups, likely formed around specific games, content types, or streamer friendships.
--   **Preferential Attachment**: The network's structure is much better explained by the Barabási-Albert model than the random ER model. This confirms that the network grows via **preferential attachment**: new or smaller streamers are more likely to connect with already popular streamers, reinforcing their central position.
+-   **Identification of Key Influencers**: Centrality analysis revealed a diverse set of influential artists, including **Diplo**, **Snoop Dogg**, and **Anitta**, each playing a different structural role in the network (e.g., high degree vs. high betweenness).
+-   **Genre-Based Communities**: The Girvan-Newman algorithm successfully identified meaningful communities that strongly align with musical genres and geographical regions, such as Indian fusion, Latin music, and German pop.
+-   **Network Fragility**: The fault tolerance analysis demonstrated that the network is relatively resilient to random failures but **highly vulnerable to targeted attacks**. The removal of just a few central artists caused a **dramatic collapse of the giant component** and severe fragmentation of the network.
+-   **The Importance of Hubs**: This project empirically confirms the critical role of highly connected "hub" artists in maintaining the cohesion and connectivity of the global music scene. Their removal has a disproportionately large impact on collaboration opportunities across the entire network.
 
 ---
 
@@ -105,25 +107,20 @@ The project is divided into a systematic, multi-step analysis workflow.
 
 .
 ├── data/
-│   ├── nodes.csv              \# Raw list of streamers
-│   ├── edges.csv              \# Raw list of connections
-│   ├── cleaned\_nodes.csv        \# Nodes after preprocessing
-│   └── cleaned\_edges.csv        \# Edges after preprocessing
-├── figures/
-│   └── ...                    \# PNG images of network visualizations
-├── part\_1.ipynb                 \# Jupyter Notebook for data prep and centrality analysis
-├── part\_2.ipynb                 \# Jupyter Notebook for community detection and network models
-├── presentation SNA.pdf         \# The final project presentation
-├── cytoscape.cys                \# Cytoscape session file for interactive visualization
-├── network\_measures.csv         \# CSV with global network metrics
-├── centrality\_measures.csv      \# CSV with node-level centrality scores
-└── README.md                    \# This file
+│   ├── nodes.csv          \# Full dataset of artists (nodes)
+│   └── edges.csv          \# Full dataset of collaborations (edges)
+├── analysis\_part\_1.ipynb  \# Notebook for global analysis and centrality measures
+├── analysis\_part\_2.ipynb  \# Notebook for community detection and fault tolerance
+├── centrality\_measures.csv  \# CSV output of node centrality scores
+├── cytoscape.cys          \# Cytoscape session file for visualization
+├── presentation SNA.pdf   \# The final project presentation
+└── README.md              \# This file
 
 ````
 
 ---
 
-## 🚀 How to Run the Analysis
+## 🚀 How to Run This Project
 
 1.  **Clone the repository:**
     ```bash
@@ -135,7 +132,7 @@ The project is divided into a systematic, multi-step analysis workflow.
     ```bash
     python -m venv venv
     source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-    pip install pandas networkx matplotlib seaborn jupyter
+    pip install pandas numpy networkx matplotlib seaborn jupyter
     ```
 
 3.  **Launch Jupyter Notebook:**
@@ -144,19 +141,14 @@ The project is divided into a systematic, multi-step analysis workflow.
     ```
 
 4.  **Run the Notebooks:**
-    -   Open and run `part_1.ipynb` to perform the initial data cleaning, network construction, and centrality analysis.
-    -   Open and run `part_2.ipynb` to perform community detection and compare the network to theoretical models.
+    -   Open and run `analysis_part_1.ipynb` and `analysis_part_2.ipynb` to replicate the analyses. *Note: Running on the full dataset may be slow; the notebooks are likely configured to use smaller samples.*
 
 5.  **Explore in Cytoscape (Optional):**
-    -   Download and install [Cytoscape](https://cytoscape.org/).
-    -   Open the `cytoscape.cys` file to explore the fully visualized and styled network graph.
+    -   Install [Cytoscape](https://cytoscape.org/).
+    -   Import the edge and node CSV files to create and explore interactive visualizations of the network.
 
 ---
 
-## 👥 Authors
+## ✍️ Author
 
 - **Daniele Borghesi**
-- **Eva Cantin Larumbe**
-- **Eva Teisberg**
-- **Mikel Baraza Vidal**
-- **Francesco Pio Capoccello**
